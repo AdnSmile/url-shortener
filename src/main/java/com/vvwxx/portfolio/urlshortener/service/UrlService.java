@@ -4,13 +4,16 @@ import com.vvwxx.portfolio.urlshortener.entity.Url;
 import com.vvwxx.portfolio.urlshortener.repository.UrlRepository;
 import com.vvwxx.portfolio.urlshortener.util.Base62Convert;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
 public class UrlService {
 
     private final UrlRepository urlRepository;
+    private final StringRedisTemplate redisTemplate;
 
     public String shortenUrl(String originalUrl) {
 
@@ -23,12 +26,23 @@ public class UrlService {
 
     public String getOriginalUrl(String shortUrl) {
 
+        String cachedUrl = redisTemplate.opsForValue().get(shortUrl);
+
+        if (cachedUrl != null) {
+            System.out.println("Hit from cache redis");
+            return cachedUrl;
+        }
+
+        System.out.println("Hit from db");
         long id = Base62Convert.decode(shortUrl);
 
         Url data = urlRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Url not found for code: " + shortUrl));
 
-        return data.getLongUrl();
+        String originalUrl = data.getLongUrl();
+        redisTemplate.opsForValue().set(shortUrl, originalUrl, 24, TimeUnit.HOURS);
+
+        return originalUrl;
 
     }
 }
