@@ -14,6 +14,7 @@ public class UrlService {
 
     private final UrlRepository urlRepository;
     private final StringRedisTemplate redisTemplate;
+    private final AnalyticsService analyticsService;
 
     public String shortenUrl(String originalUrl) {
 
@@ -26,6 +27,9 @@ public class UrlService {
 
     public String getOriginalUrl(String shortUrl) {
 
+        long id = Base62Convert.decode(shortUrl);
+        analyticsService.trackClick(id);
+
         String cachedUrl = redisTemplate.opsForValue().get(shortUrl);
 
         if (cachedUrl != null) {
@@ -34,8 +38,6 @@ public class UrlService {
         }
 
         System.out.println("Hit from db");
-        long id = Base62Convert.decode(shortUrl);
-
         Url data = urlRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Url not found for code: " + shortUrl));
 

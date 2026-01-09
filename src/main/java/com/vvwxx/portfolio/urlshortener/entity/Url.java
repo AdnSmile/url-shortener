@@ -20,6 +20,9 @@ public class Url {
     @Column(nullable = false)
     private String longUrl;
 
+    @Column(nullable = false)
+    private int clickCount = 0;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdDate;
