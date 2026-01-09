@@ -27,24 +27,27 @@ public class UrlService {
 
     public String getOriginalUrl(String shortUrl) {
 
-        long id = Base62Convert.decode(shortUrl);
-        analyticsService.trackClick(id);
+        try {
+            long id = Base62Convert.decode(shortUrl);
+            analyticsService.trackClick(id);
 
-        String cachedUrl = redisTemplate.opsForValue().get(shortUrl);
+            String cachedUrl = redisTemplate.opsForValue().get(shortUrl);
 
-        if (cachedUrl != null) {
-            System.out.println("Hit from cache redis");
-            return cachedUrl;
+            if (cachedUrl != null) {
+                System.out.println("Hit from cache redis");
+                return cachedUrl;
+            }
+
+            System.out.println("Hit from db");
+            Url data = urlRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Url not found for code: " + shortUrl));
+
+            String originalUrl = data.getLongUrl();
+            redisTemplate.opsForValue().set(shortUrl, originalUrl, 24, TimeUnit.HOURS);
+
+            return originalUrl;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-
-        System.out.println("Hit from db");
-        Url data = urlRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Url not found for code: " + shortUrl));
-
-        String originalUrl = data.getLongUrl();
-        redisTemplate.opsForValue().set(shortUrl, originalUrl, 24, TimeUnit.HOURS);
-
-        return originalUrl;
-
     }
 }

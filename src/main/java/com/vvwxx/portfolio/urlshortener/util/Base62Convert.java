@@ -28,6 +28,11 @@ public class Base62Convert {
         for (int i=0; i<shortCode.length(); i++) {
             char c = shortCode.charAt(i);
             int val = ALLOWED_CHARACTERS.indexOf(c);
+
+            if (val == -1) {
+                throw new IllegalArgumentException("Invalid character in short code: " + c);
+            }
+
             id = id * 62 + val;
         }
 
