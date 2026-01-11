@@ -10,6 +10,7 @@ A scalable, high-performance URL shortening service built with Java Spring Boot.
 
 This system is designed to minimize Database load and maximize response time.
 
+<img width="831" height="454" alt="System Design URLShortener drawio" src="https://github.com/user-attachments/assets/8671e8d9-4729-4a0a-a7bd-ba0ef3350eb1" />
 
 
 ### ✨ Key Features (Engineering Decisions)
