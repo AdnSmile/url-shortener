@@ -77,7 +77,7 @@ docker-compose up -d
 ```bash
 curl -X POST http://localhost:8080/api/url/shorten \
      -H "Content-Type: application/json" \
-     -d '{"longUrl": "https://www.linkedin.com/in/yourprofile"}'
+     -d '{"longUrl": "https://www.linkedin.com/in/nessafitri/"}'
 ```
 *Response:* `Ab1`
 
